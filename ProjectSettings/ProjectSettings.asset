@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: d39a14e6b5dd56d4ebfe3235cfbae3d0
+  productGUID: b7a9e79e9a0d9b74eb51282235d1ffeb
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: Cubes
+  productName: Rain
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -675,14 +675,14 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: Cubes
+  metroPackageName: Rain
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: Cubes
+  metroApplicationDescription: Rain
   wsaImages: {}
   metroTileShortName: 
   metroTileShowName: 0
@@ -754,10 +754,10 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 1c5b4a3e-a74b-42cf-9a11-2e8b105e30ec
+  cloudProjectId: c4197a5c-594f-44fc-b8cf-00e18ed4dd65
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Cubes
+  projectName: Rain 2025-01-28_19-05-06
   organizationId: silence_2100
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
