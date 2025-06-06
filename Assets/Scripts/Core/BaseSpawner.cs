@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class GenericPool<T> : MonoBehaviour where T : MonoBehaviour
+public abstract class BaseSpawner<T> : MonoBehaviour, IPoolStats where T : MonoBehaviour
 {
-    [SerializeField] private T _prefab;
-    [SerializeField] private int _maxPoolSize = 20;
+    [SerializeField] protected T _prefab;
+    [SerializeField] protected int _maxPoolSize = 20;
 
-    private ObjectPool<T> _pool;
+    protected ObjectPool<T> _pool;
+
     private int _spawnCount;
     private int _createdCount;
 
@@ -14,17 +15,7 @@ public class GenericPool<T> : MonoBehaviour where T : MonoBehaviour
     public int TotalCreated => _createdCount;
     public int ActiveCount => _pool.CountActive;
 
-    public T Get()
-    {
-        return _pool.Get();
-    }
-
-    public void Release(T obj)
-    {
-        _pool.Release(obj);
-    }
-
-    private void Awake()
+    protected virtual void Awake()
     {
         _pool = new ObjectPool<T>(
             createFunc: CreateInstance,
@@ -37,13 +28,27 @@ public class GenericPool<T> : MonoBehaviour where T : MonoBehaviour
         );
     }
 
+    public T Spawn(Vector3 position)
+    {
+        T obj = _pool.Get();
+
+        obj.transform.position = position;
+        obj.transform.rotation = Quaternion.identity;
+
+        InitializeObject(obj);
+
+        return obj;
+    }
+
+    protected abstract void InitializeObject(T obj);
+
     private T CreateInstance()
     {
         _createdCount++;
+        T newObj = Instantiate(_prefab);
+        newObj.gameObject.SetActive(false);
 
-        T newObject = Instantiate(_prefab);
-        newObject.gameObject.SetActive(false);
-        return newObject;
+        return newObj;
     }
 
     private void OnGet(T obj)

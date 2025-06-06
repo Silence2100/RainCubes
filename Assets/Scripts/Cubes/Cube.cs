@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Renderer), typeof(Rigidbody))]
-
 public class Cube : MonoBehaviour
 {
     private bool _hasTouched = false;
@@ -22,7 +21,7 @@ public class Cube : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!_hasTouched && collision.collider.GetComponent<Platform>() != null)
+        if (_hasTouched == false && collision.collider.GetComponent<Platform>() != null)
         {
             _hasTouched = true;
             ChangeColor();

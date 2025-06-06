@@ -11,6 +11,8 @@ public class Bomb : MonoBehaviour
     private static readonly string KeywordAlphaBlend = "_ALPHABLEND_ON";
     private static readonly string KeywordAlphaPremultiply = "_ALPHAPREMULTIPLY_ON";
 
+    public event Action<Bomb> OnExploded;
+
     [SerializeField] private float _explosionRadius = 5f;
     [SerializeField] private float _explosionForce = 700f;
     [SerializeField] private float _fadeDurationMin = 2f;
@@ -26,8 +28,6 @@ public class Bomb : MonoBehaviour
     private Material _materialInstance;
     private float _fadeDuration;
     private bool _hasExploded = false;
-
-    public event Action<Bomb> OnExploded;
 
     private void Awake()
     {
