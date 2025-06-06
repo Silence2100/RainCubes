@@ -12,7 +12,9 @@ public abstract class BaseSpawner<T> : MonoBehaviour, IPoolStatsNotifier where T
     public int TotalCreated { get; private set; }
     public int ActiveCount => _pool.CountActive;
 
-    public event System.Action<int, int, int> OnPoolStatsChanged;
+    public event System.Action<int> OnTotalSpawnedChanged;
+    public event System.Action<int> OnTotalCreatedChanged;
+    public event System.Action<int> OnActiveCountChanged;
 
     protected virtual void Awake()
     {
@@ -45,7 +47,7 @@ public abstract class BaseSpawner<T> : MonoBehaviour, IPoolStatsNotifier where T
     {
         TotalCreated++;
 
-        OnPoolStatsChanged?.Invoke(TotalSpawned, TotalCreated, ActiveCount);
+        OnTotalCreatedChanged?.Invoke(TotalCreated);
 
         T newObj = Instantiate(_prefab);
         newObj.gameObject.SetActive(false);
@@ -58,20 +60,21 @@ public abstract class BaseSpawner<T> : MonoBehaviour, IPoolStatsNotifier where T
         TotalSpawned++;
         obj.gameObject.SetActive(true);
 
-        OnPoolStatsChanged?.Invoke(TotalSpawned, TotalCreated, ActiveCount);
+        OnTotalSpawnedChanged?.Invoke(TotalSpawned);
+        OnActiveCountChanged?.Invoke(ActiveCount);
     }
 
     private void OnRelease(T obj)
     {
         obj.gameObject.SetActive(false);
 
-        OnPoolStatsChanged?.Invoke(TotalSpawned, TotalCreated, ActiveCount);
+        OnActiveCountChanged?.Invoke(ActiveCount);
     }
 
     private void OnDestroyInstance(T obj)
     {
         Destroy(obj.gameObject);
 
-        OnPoolStatsChanged?.Invoke(TotalSpawned, TotalCreated, ActiveCount);
+        OnActiveCountChanged?.Invoke(ActiveCount);
     }
 }

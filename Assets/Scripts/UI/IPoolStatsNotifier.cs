@@ -1,4 +1,6 @@
 public interface IPoolStatsNotifier : IPoolStats
 {
-    event System.Action<int, int, int> OnPoolStatsChanged;
+    event System.Action<int> OnTotalSpawnedChanged;
+    event System.Action<int> OnTotalCreatedChanged;
+    event System.Action<int> OnActiveCountChanged;
 }

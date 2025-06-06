@@ -5,12 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer), typeof(Rigidbody))]
 public class Bomb : MonoBehaviour
 {
-    private const int RenderQueueDefault = -1;
-
-    private static readonly string KeywordAlphaTest = "_ALPHATEST_ON";
-    private static readonly string KeywordAlphaBlend = "_ALPHABLEND_ON";
-    private static readonly string KeywordAlphaPremultiply = "_ALPHAPREMULTIPLY_ON";
-
     public event Action<Bomb> OnExploded;
 
     [SerializeField] private float _explosionRadius = 5f;
@@ -18,31 +12,23 @@ public class Bomb : MonoBehaviour
     [SerializeField] private float _fadeDurationMin = 2f;
     [SerializeField] private float _fadeDurationMax = 5f;
 
-    private int _shaderModeOpaque = 0;
-    private int _shaderModeTransparent = 3;
-    private UnityEngine.Rendering.BlendMode _srcBlendMode = UnityEngine.Rendering.BlendMode.SrcAlpha;
-    private UnityEngine.Rendering.BlendMode _dstBlendMode = UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha;
-    private int _renderQueueTransparent = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-
-    private Renderer _renderer;
-    private Material _materialInstance;
+    private MaterialHelper _materialHelper;
+    private Exploader _exploader;
     private bool _hasExploded = false;
 
     private void Awake()
     {
-        _renderer = GetComponent<Renderer>();
-        _materialInstance = Instantiate(_renderer.material);
-        _renderer.material = _materialInstance;
+        Renderer renderer = GetComponent<Renderer>();
+        _materialHelper = new MaterialHelper(renderer);
+
+        _exploader = new Exploader(_explosionRadius, _explosionForce);
     }
 
     public void InitializeBomb()
     {
         _hasExploded = false;
-        SetMaterialOpaque();
 
-        Color color = _materialInstance.color;
-        color.a = 1f;
-        _materialInstance.color = color;
+        _materialHelper.ResetToOriginal();
 
         float fadeDuration = UnityEngine.Random.Range(_fadeDurationMin, _fadeDurationMax);
 
@@ -51,16 +37,17 @@ public class Bomb : MonoBehaviour
 
     private IEnumerator FadeAndExplode(float duration)
     {
-        SetMaterialTransparent();
+        _materialHelper.SetTransparent();
+
         float timer = 0f;
-        Color color = _materialInstance.color;
 
         while(timer < duration)
         {
             timer += Time.deltaTime;
             float time = timer / duration;
-            color.a = Mathf.Lerp(1f, 0f, time);
-            _materialInstance.color = color;
+            
+            _materialHelper.SetAlpha(Mathf.Lerp(1f, 0f, time));
+
             yield return null;
         }
 
@@ -76,42 +63,8 @@ public class Bomb : MonoBehaviour
 
         _hasExploded = true;
 
-        Collider[] colliders = Physics.OverlapSphere(transform.position, _explosionRadius);
-
-        foreach (Collider hit in colliders)
-        {
-            Rigidbody rigidbody = hit.GetComponent<Rigidbody>();
-
-            if (rigidbody != null)
-            {
-                rigidbody.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
-            }
-        }
+        _exploader.Explode(transform.position);
 
         OnExploded?.Invoke(this);
-    }
-
-    private void SetMaterialTransparent()
-    {
-        _materialInstance.SetFloat("_Mode", _shaderModeTransparent);
-        _materialInstance.SetInt("_SrcBlend", (int)_srcBlendMode);
-        _materialInstance.SetInt("_DstBlend", (int)_dstBlendMode);
-        _materialInstance.SetInt("_ZWrite", 0);
-        _materialInstance.DisableKeyword(KeywordAlphaTest);
-        _materialInstance.EnableKeyword(KeywordAlphaBlend);
-        _materialInstance.DisableKeyword(KeywordAlphaPremultiply);
-        _materialInstance.renderQueue = _renderQueueTransparent;
-    }
-
-    private void SetMaterialOpaque()
-    {
-        _materialInstance.SetFloat("_Mode", _shaderModeOpaque);
-        _materialInstance.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-        _materialInstance.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-        _materialInstance.SetInt("_ZWrite", 1);
-        _materialInstance.DisableKeyword(KeywordAlphaTest);
-        _materialInstance.DisableKeyword(KeywordAlphaBlend);
-        _materialInstance.DisableKeyword(KeywordAlphaPremultiply);
-        _materialInstance.renderQueue = RenderQueueDefault;
     }
 }

@@ -1,41 +1,47 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PoolStatsUI : MonoBehaviour
+public abstract class PoolStatsUI<T> : MonoBehaviour where T : MonoBehaviour, IPoolStatsNotifier
 {
-    [SerializeField] private MonoBehaviour _poolComponent;
+    [SerializeField] protected T _poolComponent;
 
     [SerializeField] private Text _textSpawned;
     [SerializeField] private Text _textCreated;
     [SerializeField] private Text _textActive;
 
-    private IPoolStatsNotifier _statsNotifier;
-
-    private void Awake()
+    private void Start()
     {
-        _statsNotifier = _poolComponent as IPoolStatsNotifier;
+        _poolComponent.OnTotalSpawnedChanged += HandleSpawnedChanged;
+        _poolComponent.OnTotalCreatedChanged += HandleCreatedChanged;
+        _poolComponent.OnActiveCountChanged += HandleActiveCountChanged;
 
-        _statsNotifier.OnPoolStatsChanged += HandleStatsChanged;
-
-        HandleStatsChanged(
-            _statsNotifier.TotalSpawned,
-            _statsNotifier.TotalCreated,
-            _statsNotifier.ActiveCount
-        );
+        _textSpawned.text = $"Заспавнено: {_poolComponent.TotalSpawned}";
+        _textCreated.text = $"Создано: {_poolComponent.TotalCreated}";
+        _textActive.text = $"Активно: {_poolComponent.ActiveCount}";
     }
 
     private void OnDestroy()
     {
-        if (_statsNotifier != null)
+        if (_poolComponent != null)
         {
-            _statsNotifier.OnPoolStatsChanged -= HandleStatsChanged;
+            _poolComponent.OnTotalSpawnedChanged -= HandleSpawnedChanged;
+            _poolComponent.OnTotalCreatedChanged -= HandleCreatedChanged;
+            _poolComponent.OnActiveCountChanged -= HandleActiveCountChanged;
         }
     }
 
-    private void HandleStatsChanged(int totalSpawned, int totalCreated, int activeCount)
+    private void HandleSpawnedChanged(int newTotalSpawned)
     {
-        _textSpawned.text = $"Заспавнено: {totalSpawned}";
-        _textCreated.text = $"Создано: {totalCreated}";
-        _textActive.text = $"Активно: {activeCount}";
+        _textSpawned.text = $"Заспавнено: {newTotalSpawned}";
+    }
+
+    private void HandleCreatedChanged(int newTotalCreated)
+    {
+        _textCreated.text = $"Создано: {newTotalCreated}";
+    }
+
+    private void HandleActiveCountChanged(int newActiveCount)
+    {
+        _textActive.text = $"Активно: {newActiveCount}";
     }
 }
